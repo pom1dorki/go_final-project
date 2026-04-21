@@ -1,18 +1,19 @@
 package server
 
 import (
+	"GO_FINAL_PROJECT/pkg/api"
 	"fmt"
 	"net/http"
 	"os"
 )
 
 func New() {
-	port := os.Getenv("TODO_PORT")
+	api.Init()
 
+	port := os.Getenv("TODO_PORT")
 	if port == "" {
 		port = "7540"
 	}
-
 	addr := ":" + port
 
 	webDir := "web"
