@@ -80,3 +80,59 @@ func addTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	writeJSON(w, map[string]string{"id": fmt.Sprintf("%d", id)})
 }
+
+func getTaskHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	id := r.FormValue("id")
+	if id == "" {
+		writeJSON(w, map[string]string{"error": "Не указан идентификатор"})
+		return
+	}
+
+	task, err := db.GetTask(id)
+	if err != nil {
+		writeJSON(w, map[string]string{"error": "Задача не найдена"})
+		return
+	}
+
+	writeJSON(w, task)
+}
+
+func updateTaskHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPut {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var task db.Task
+	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
+		writeJSON(w, map[string]string{"error": err.Error()})
+		return
+	}
+
+	if task.ID == "" {
+		writeJSON(w, map[string]string{"error": "Не указан идентификатор"})
+		return
+	}
+
+	if task.Title == "" {
+		writeJSON(w, map[string]string{"error": "Не указан заголовок задачи"})
+		return
+	}
+
+	if err := checkDate(&task); err != nil {
+		writeJSON(w, map[string]string{"error": err.Error()})
+		return
+	}
+
+	if err := db.UpdateTask(&task); err != nil {
+		writeJSON(w, map[string]string{"error": err.Error()})
+		return
+	}
+
+	writeJSON(w, map[string]any{})
+}
