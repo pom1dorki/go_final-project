@@ -29,7 +29,7 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 	case "y":
 		for {
 			date = date.AddDate(1, 0, 0)
-			if afterNow(date, now) {
+			if AfterNow(date, now) {
 				break
 			}
 		}
@@ -45,7 +45,7 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 		}
 		for {
 			date = date.AddDate(0, 0, interval)
-			if afterNow(date, now) {
+			if AfterNow(date, now) {
 				break
 			}
 		}
@@ -56,7 +56,7 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 	}
 }
 
-func afterNow(date, now time.Time) bool {
+func AfterNow(date, now time.Time) bool {
 	d := date.Truncate(24 * time.Hour)
 	n := now.Truncate(24 * time.Hour)
 	return d.After(n)
