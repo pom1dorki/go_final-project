@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"GO_FINAL_PROJECT/pkg/db"
@@ -135,4 +136,33 @@ func updateTaskHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, map[string]any{})
+}
+
+func signinHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req struct {
+		Password string `json:"password"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeJSON(w, map[string]string{"error": err.Error()})
+		return
+	}
+
+	pass := os.Getenv("TODO_PASSWORD")
+	if pass == "" || req.Password != pass {
+		writeJSON(w, map[string]string{"error": "Неверный пароль"})
+		return
+	}
+
+	token, err := generateToken(pass)
+	if err != nil {
+		writeJSON(w, map[string]string{"error": err.Error()})
+		return
+	}
+
+	writeJSON(w, map[string]string{"token": token})
 }
