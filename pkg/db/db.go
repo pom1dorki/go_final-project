@@ -49,3 +49,10 @@ func AddTask(task *Task) (int64, error) {
 	id, err := res.LastInsertId()
 	return id, err
 }
+
+func Close() error {
+	if db != nil {
+		return db.Close()
+	}
+	return nil
+}

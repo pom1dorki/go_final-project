@@ -17,7 +17,13 @@ func main() {
 		fmt.Println("Ошибка инициализации базы данных:", err)
 		return
 	}
-	fmt.Println("База данных успешно инициализирована (scheduler.db)")
+	fmt.Println("База данных успешно инициализирована:", dbFile)
+
+	defer func() {
+		if err := db.Close(); err != nil {
+			fmt.Println("Ошибка закрытия базы данных:", err)
+		}
+	}()
 
 	server.New()
 }

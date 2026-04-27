@@ -31,11 +31,15 @@ func Tasks(limit int) ([]*Task, error) {
 		tasks = append(tasks, &t)
 	}
 
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	if tasks == nil {
 		tasks = []*Task{}
 	}
 
-	return tasks, rows.Err()
+	return tasks, nil
 }
 
 func GetTask(id string) (*Task, error) {
@@ -82,6 +86,18 @@ func DeleteTask(id string) error {
 }
 
 func UpdateDate(next string, id string) error {
-	_, err := db.Exec(`UPDATE scheduler SET date = ? WHERE id = ?`, next, id)
-	return err
+	res, err := db.Exec(`UPDATE scheduler SET date = ? WHERE id = ?`, next, id)
+	if err != nil {
+		return fmt.Errorf("failed to update date: %v", err)
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to check update result: %v", err)
+	}
+	if count == 0 {
+		return fmt.Errorf("task not found")
+	}
+
+	return nil
 }

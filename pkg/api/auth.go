@@ -86,14 +86,12 @@ func auth(next http.HandlerFunc) http.HandlerFunc {
 
 		cookie, err := r.Cookie("token")
 		if err != nil || cookie.Value == "" {
-			writeJSON(w, map[string]string{"error": "Authentication required"})
-			w.WriteHeader(http.StatusUnauthorized)
+			writeJSON(w, map[string]string{"error": "Authentication required"}, http.StatusUnauthorized)
 			return
 		}
 
 		if !validateToken(cookie.Value, pass) {
-			writeJSON(w, map[string]string{"error": "Authentication required"})
-			w.WriteHeader(http.StatusUnauthorized)
+			writeJSON(w, map[string]string{"error": "Authentication required"}, http.StatusUnauthorized)
 			return
 		}
 
